@@ -691,6 +691,15 @@ int receive_pim_register(uint32_t reg_src, uint32_t reg_dst, char *msg, size_t l
 	return FALSE;
     }
 
+    if (local_address(reg_dst) == NO_VIF || !check_group_rp(inner_grp, reg_dst)) {
+	IF_DEBUG(DEBUG_PIM_REGISTER)
+	    logit(LOG_DEBUG, 0, "Not RP of group %s", inet_fmt(inner_grp, s2, sizeof(s2)));
+	send_pim_register_stop(reg_dst, reg_src, inner_grp, inner_src);
+	return TRUE;
+    }
+
+    /* I am the RP */
+
     mrtentry = find_route(inner_src, inner_grp, MRTF_WC, DONT_CREATE);
     if (!mrtentry) {
 	IF_DEBUG(DEBUG_PIM_REGISTER)
@@ -716,18 +725,6 @@ int receive_pim_register(uint32_t reg_src, uint32_t reg_dst, char *msg, size_t l
     }
 
     mrtentry = find_route(inner_src, inner_grp, MRTF_SG | MRTF_WC | MRTF_PMBR, DONT_CREATE);
-
-    /* Check if I am the RP for that group */
-    if ((local_address(reg_dst) == NO_VIF) || !check_mrtentry_rp(mrtentry, reg_dst)) {
-	IF_DEBUG(DEBUG_PIM_REGISTER)
-	    logit(LOG_DEBUG, 0, "Not RP in address %s", inet_fmt(reg_dst, s1, sizeof(s1)));
-
-	send_pim_register_stop(reg_dst, reg_src, inner_grp, inner_src);
-
-	return TRUE;
-    }
-
-    /* I am the RP */
 
     if (mrtentry->flags & MRTF_SG) {
 	/* (S,G) found */

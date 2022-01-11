@@ -630,6 +630,7 @@ extern rpentry_t *rp_find		(uint32_t rp_address);
 extern int	remap_grpentry		(grpentry_t *grpentry_ptr);
 extern int	create_pim_bootstrap_message (char *send_buff);
 extern int	check_mrtentry_rp	(mrtentry_t *mrtentry_ptr, uint32_t rp_addr);
+extern int	check_group_rp		(uint32_t group, uint32_t rp_addr);
 extern void	age_misc		(void);
 
 #ifdef RSRR

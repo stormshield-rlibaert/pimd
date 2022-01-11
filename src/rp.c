@@ -972,6 +972,16 @@ int check_mrtentry_rp(mrtentry_t *mrt, uint32_t addr)
 }
 
 /*
+ * Check if the addr is the RP for the group
+ * Return TRUE or FALSE.
+ */
+int check_group_rp(uint32_t group, uint32_t addr)
+{
+    rpentry_t *rp = rp_match(group);
+    return rp != NULL && rp->address == addr;
+}
+
+/*
  * TODO: timeout the RP-group mapping entries during the scan of the
  * whole routing table?
  */
